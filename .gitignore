@@ -1,0 +1,47 @@
+# Entorno virtual
+.venv/
+venv/
+ENV/
+env/
+
+# Archivos de entorno
+.env
+
+# Archivos compilados de Python
+*.py[cod]
+*.pyo
+__pycache__/
+*.so
+
+# Configuraciones de instancia y despliegue
+instance/
+
+# Archivos de pruebas y cobertura
+.pytest_cache/
+.coverage
+*.cover
+*.log
+htmlcov/
+
+# Archivos y directorios generados
+dist/
+build/
+*.egg-info/
+.eggs/
+*.egg
+*.manifest
+*.spec
+
+# PyInstaller
+*.spec
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# Archivos de IDE
+.vscode/
+.idea/
+
+# Archivos de configuración del sistema operativo
+.DS_Store
+Thumbs.db

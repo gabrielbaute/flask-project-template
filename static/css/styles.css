@@ -1,0 +1,41 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f5f5;
+  }
+  
+  .container {
+    margin-top: 2rem;
+  }
+  
+  .flash-message {
+    margin-bottom: 1rem;
+  }
+  
+  .flash-message.is-primary {
+    background-color: #209cee;
+    color: white;
+    padding: 0.75rem;
+    border-radius: 0.25rem;
+  }
+  
+  .flash-message.is-danger {
+    background-color: #ff3860;
+    color: white;
+    padding: 0.75rem;
+    border-radius: 0.25rem;
+  }
+  
+  .flash-message.is-warning {
+    background-color: #ffdd57;
+    color: black;
+    padding: 0.75rem;
+    border-radius: 0.25rem;
+  }
+  
+  .flash-message.is-success {
+    background-color: #23d160;
+    color: white;
+    padding: 0.75rem;
+    border-radius: 0.25rem;
+  }
+  
