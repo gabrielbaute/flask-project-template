@@ -57,7 +57,7 @@ Esta es una plantilla reutilizable para proyectos basados en Flask, diseñada pa
 ## Instalación y Configuración
 1. Clona el repositorio:
     ```sh
-    git clone https://github.com/tu_usuario/flask-project-template.git
+    git clone https://github.com/gabrielbaute/flask-project-template.git
     cd flask-project-template
     ```
 
