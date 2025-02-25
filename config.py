@@ -22,7 +22,7 @@ class Config:
     ADMIN_PASSWORD=os.environ.get('ADMIN_PASSWORD') or 'admin_password'
 
     # SQLAlchemy
-    SQLALCHEMY_DATABASE_URI=os.environ.get('SQLALCHEMY_DATABASE_URI') or f'sqlite:///{os.path.join(BASE_DIR, "audiobooks.db")}'
+    SQLALCHEMY_DATABASE_URI=os.environ.get('SQLALCHEMY_DATABASE_URI') or f'sqlite:///{os.path.join(BASE_DIR, "yourdatabase.db")}'
     SQLALCHEMY_TRACK_MODIFICATIONS=os.environ.get('SQLALCHEMY_TRACK_MODIFICATIONS') or False
 
     # Encriptado
