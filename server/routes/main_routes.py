@@ -1,5 +1,6 @@
 from flask import Blueprint, redirect, url_for, render_template, session, current_app
 from flask_login import login_required, current_user
+from database.models import User
 
 main_bp = Blueprint('main', __name__)
 
@@ -14,5 +15,8 @@ def index():
 @login_required
 def home():
     user_id = session.get('user_id')
-    # Lógica para renderizar la página de inicio, usando user_id para recuperar la información del usuario
-    return render_template('main_templates/home.html')
+    if user_id:
+        user = User.query.get(user_id)
+        return render_template('main_templates/home.html', user=user)
+    else:
+        return redirect(url_for('auth.login'))
