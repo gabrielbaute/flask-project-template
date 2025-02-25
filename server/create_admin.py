@@ -12,7 +12,8 @@ def create_admin_user():
         admin_user = User(
             username=admin_username,
             email=admin_email,
-            password=generate_password_hash(admin_password, method='pbkdf2:sha256')
+            password=generate_password_hash(admin_password, method='pbkdf2:sha256'),
+            is_active=True
         )
         db.session.add(admin_user)
         db.session.commit()
