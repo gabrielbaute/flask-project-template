@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import jwt
 
 from mail import send_confirmation_email,send_account_locked_email, decode_email_token, create_email_token, send_reset_password_email, create_reset_token, decode_reset_token
-from server.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm, ReactivateAccountForm
+from server.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm, ReactivateAccountForm, ResendConfirmationForm
 from database.models import User, PasswordHistory
 from utils import enforce_password_history_limit
 from database import db
@@ -46,8 +46,8 @@ def register():
 def confirm_email(token):
     user_id = decode_email_token(token)
     if user_id is None:
-        flash('The confirmation link is invalid or has expired.', 'danger')
-        return redirect(url_for('auth.login'))
+        flash('The confirmation link is invalid or has expired. Please request a new confirmation link below.', 'danger')
+        return redirect(url_for('auth.resend_confirmation'))
 
     user = User.query.get(user_id)
     if user.is_active:
@@ -64,6 +64,23 @@ def confirm_email(token):
     db.session.commit()
     flash('Your account has been confirmed. You can now log in.', 'success')
     return redirect(url_for('auth.login'))
+
+@auth_bp.route('/resend_confirmation', methods=['GET', 'POST'])
+def resend_confirmation():
+    form = ResendConfirmationForm()
+    if form.validate_on_submit():
+        email = form.email.data
+        user = User.query.filter_by(email=email).first()
+
+        if user and not user.is_active:
+            send_confirmation_email(user)
+            flash('A new confirmation email has been sent to your email address.', 'success')
+        else:
+            flash('Invalid email or the account is already active.', 'danger')
+
+        return redirect(url_for('auth.login'))
+
+    return render_template('auth_templates/resend_confirmation.html', form=form)
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
