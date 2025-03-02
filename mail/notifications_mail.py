@@ -1,22 +1,20 @@
 from flask_mail import Message
 from database.user_models import User
 from server.extensions import mail
-from flask import request
+from flask import request, render_template
 
 def send_login_notification(user, ip_address):
+    device = request.user_agent.platform
+    browser = request.user_agent.browser
+
+    # Renderizar la plantilla con los datos
     msg = Message('New Login Notification', recipients=[user.email])
-    msg.body = f"""
-    Hi {user.username},
-    
-    A new login to your account has been detected:
-
-    IP Address: {ip_address}
-    Device: {request.user_agent.platform} ({request.user_agent.browser})
-    
-    If this was you, no further action is needed.
-    If you did not log in, please reset your password immediately.
-
-    Best regards,
-    Security Team
-    """
+    msg.html = render_template(
+        'email_templates/login_notification.html',
+        username=user.username,
+        ip_address=ip_address,
+        device=device,
+        browser=browser
+    )
     mail.send(msg)
+

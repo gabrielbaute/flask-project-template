@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>New Login Detected</title>
+  </head>
+  <body>
+    <p>Hi {{ username }},</p>
+    <p>A new login to your account has been detected:</p>
+    <ul>
+      <li><strong>IP Address:</strong> {{ ip_address }}</li>
+      <li><strong>Device:</strong> {{ device }}</li>
+      <li><strong>Browser:</strong> {{ browser }}</li>
+    </ul>
+    <p>If this was you, no further action is required. If you did not log in, please reset your password immediately.</p>
+    <p>Best regards,<br>The Security Team</p>
+  </body>
+</html>
