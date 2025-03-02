@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, make_response, session, current_app, send_file
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, make_response, session, current_app, send_file, abort
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, set_access_cookies, unset_jwt_cookies, unset_access_cookies
@@ -232,22 +232,29 @@ def reactivate_account():
 def enable_2fa():
     user = current_user
     if user.totp_secret is None:
-        # Generar un nuevo secreto TOTP
+        # Generar un nuevo secreto TOTP si no existe
         user.totp_secret = pyotp.random_base32()
         db.session.commit()
 
-    # Crear la URI TOTP para generar el código QR
-    totp_uri = pyotp.totp.TOTP(user.totp_secret).provisioning_uri(
-        name=user.email,
+    # Renderizar la plantilla con el QR generado dinámicamente desde get_qr_code
+    return render_template('auth_templates/enable_2fa.html', user_id=user.id)
+
+@auth_bp.route('/get_qr_code/<user_id>', methods=['GET'])
+@login_required
+def get_qr_code(user_id):
+    if current_user.id != user_id:
+        abort(403)  # Asegurarse de que solo el usuario autenticado puede acceder a su QR
+
+    totp_uri = pyotp.totp.TOTP(current_user.totp_secret).provisioning_uri(
+        name=current_user.email,
         issuer_name="YourAppName"
     )
-
-    # Generar el código QR
     qr = qrcode.make(totp_uri)
-    qr_path = f'static/qr_codes/{user.id}_qr.png'
-    qr.save(qr_path)
+    buffer = BytesIO()
+    qr.save(buffer, format="PNG")
+    buffer.seek(0)
 
-    return render_template('auth_templates/enable_2fa.html', qr_code=qr_path)
+    return send_file(buffer, mimetype='image/png')
 
 @auth_bp.route('/verify_2fa', methods=['GET', 'POST'])
 @login_required
