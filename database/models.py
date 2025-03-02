@@ -12,6 +12,7 @@ class User(UserMixin, db.Model):
     failed_login_attempts = db.Column(db.Integer, default=0)  # Contador de intentos fallidos
     last_failed_login = db.Column(db.DateTime, nullable=True)  # Fecha del último intento fallido
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    totp_secret = db.Column(db.String(32), nullable=True)
 
     def __repr__(self):
         return f'<User {self.username}>'

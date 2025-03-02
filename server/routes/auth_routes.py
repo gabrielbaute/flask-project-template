@@ -1,12 +1,15 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, make_response, session, current_app
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, make_response, session, current_app, send_file
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, set_access_cookies, unset_jwt_cookies, unset_access_cookies
 from datetime import datetime, timedelta
+from io import BytesIO
 import jwt
+import pyotp
+import qrcode
 
 from mail import send_confirmation_email,send_account_locked_email, decode_email_token, create_email_token, send_reset_password_email, create_reset_token, decode_reset_token
-from server.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm, ReactivateAccountForm, ResendConfirmationForm
+from server.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm, ReactivateAccountForm, ResendConfirmationForm, TOTPForm
 from database.models import User, PasswordHistory
 from utils import enforce_password_history_limit
 from database import db
@@ -15,6 +18,9 @@ auth_bp = Blueprint('auth', __name__)
 MAX_FAILED_ATTEMPTS = 5
 LOCKOUT_PERIOD = timedelta(minutes=15)
 
+"""
+    Rutas para registro y confirmación de cuenta
+"""
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
@@ -82,6 +88,9 @@ def resend_confirmation():
 
     return render_template('auth_templates/resend_confirmation.html', form=form)
 
+"""
+    Rutas para inicio y cierre de sesión
+"""
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -135,7 +144,19 @@ def login():
 
     return render_template('auth_templates/login.html', form=form)
 
+@auth_bp.route('/logout', methods=['POST', 'GET'])
+@login_required
+def logout():
+    logout_user()
+    session.pop('user_id', None)
+    current_app.logger.info('User logged out') # Usar current_app.logger.info en caso de registrar eventos en el log
+    flash('You have been logged out.', 'success')
+    return redirect(url_for('auth.login'))
 
+
+"""
+    Rutas para restablecimiento de contraseña
+"""
 @auth_bp.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
     form = ForgotPasswordForm()
@@ -185,15 +206,6 @@ def reset_password(token):
 
     return render_template('auth_templates/reset_password.html', form=form)
 
-@auth_bp.route('/logout', methods=['POST', 'GET'])
-@login_required
-def logout():
-    logout_user()
-    session.pop('user_id', None)
-    current_app.logger.info('User logged out') # Usar current_app.logger.info en caso de registrar eventos en el log
-    flash('You have been logged out.', 'success')
-    return redirect(url_for('auth.login'))
-
 @auth_bp.route('/reactivate', methods=['GET', 'POST'])
 def reactivate_account():
     form = ReactivateAccountForm()
@@ -211,6 +223,57 @@ def reactivate_account():
         return redirect(url_for('auth.login'))
 
     return render_template('auth_templates/reactivate_account.html', form=form)
+
+"""
+    Rutas para 2FA
+"""
+@auth_bp.route('/enable_2fa', methods=['GET'])
+@login_required
+def enable_2fa():
+    user = current_user
+    if user.totp_secret is None:
+        # Generar un nuevo secreto TOTP
+        user.totp_secret = pyotp.random_base32()
+        db.session.commit()
+
+    # Crear la URI TOTP para generar el código QR
+    totp_uri = pyotp.totp.TOTP(user.totp_secret).provisioning_uri(
+        name=user.email,
+        issuer_name="YourAppName"
+    )
+
+    # Generar el código QR
+    qr = qrcode.make(totp_uri)
+    qr_path = f'static/qr_codes/{user.id}_qr.png'
+    qr.save(qr_path)
+
+    return render_template('auth_templates/enable_2fa.html', qr_code=qr_path)
+
+@auth_bp.route('/verify_2fa', methods=['GET', 'POST'])
+@login_required
+def verify_2fa():
+    form = TOTPForm()
+    if form.validate_on_submit():
+        totp = pyotp.TOTP(current_user.totp_secret)
+        if totp.verify(form.totp_code.data):
+            session['2fa_verified'] = True
+            flash('Two-Factor Authentication verified successfully!', 'success')
+            return redirect(url_for('main.home'))
+        else:
+            flash('Invalid TOTP code. Please try again.', 'danger')
+
+    return render_template('auth_templates/verify_2fa.html', form=form)
+
+@auth_bp.route('/disable_2fa', methods=['GET', 'POST'])
+@login_required
+def disable_2fa():
+    if request.method == 'POST':
+        current_user.totp_secret = None
+        db.session.commit()
+        flash('Two-Factor Authentication has been disabled.', 'success')
+        return redirect(url_for('main.home'))
+
+    return render_template('auth_templates/disable_2fa.html')
 
 @auth_bp.route('/protected', methods=['GET'])
 @jwt_required()
