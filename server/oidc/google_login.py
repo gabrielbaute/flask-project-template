@@ -1,8 +1,7 @@
 from flask import redirect, url_for, session
 from authlib.integrations.flask_client import OAuth
 from server.oidc import google_login_bp
-from database.models import User
-from database import db
+from database import db, User
 from flask_login import login_user
 
 oauth = OAuth()

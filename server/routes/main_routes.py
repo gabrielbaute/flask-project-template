@@ -1,6 +1,6 @@
 from flask import Blueprint, redirect, url_for, render_template, session, current_app
 from flask_login import login_required, current_user
-from database.models import User
+from database import User
 
 main_bp = Blueprint('main', __name__)
 

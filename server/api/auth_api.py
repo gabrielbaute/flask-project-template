@@ -1,8 +1,7 @@
 from flask import jsonify, request
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, unset_jwt_cookies
 from werkzeug.security import generate_password_hash, check_password_hash
-from database.models import User
-from database import db
+from database import db, User
 from server.extensions import jwt
 from server.api import api_bp
 from mail.auth_mail import send_reset_password_email

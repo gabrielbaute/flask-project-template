@@ -1,6 +1,5 @@
 from werkzeug.security import generate_password_hash
-from database.models import User
-from database import db
+from database import db, User
 from config import Config
 
 def create_admin_user():

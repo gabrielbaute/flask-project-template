@@ -12,7 +12,7 @@ from server.oidc.google_login import init_oauth as init_google_oauth
 from server.oidc.github_login import init_oauth as init_github_oauth
 from server.oidc.microsoft_login import init_oauth as init_microsoft_oauth
 from server.api import api_bp
-from database.models import User
+from database import User
 
 def create_app():
     app = Flask(__name__,

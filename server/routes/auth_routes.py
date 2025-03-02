@@ -9,10 +9,9 @@ import pyotp
 import qrcode
 
 from mail import send_confirmation_email,send_account_locked_email, decode_email_token, create_email_token, send_reset_password_email, create_reset_token, decode_reset_token
-from server.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm, ReactivateAccountForm, ResendConfirmationForm, TOTPForm
-from database.models import User, PasswordHistory
+from forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm, ReactivateAccountForm, ResendConfirmationForm, TOTPForm
 from utils import enforce_password_history_limit
-from database import db
+from database import db, User, PasswordHistory
 
 auth_bp = Blueprint('auth', __name__)
 MAX_FAILED_ATTEMPTS = 5
