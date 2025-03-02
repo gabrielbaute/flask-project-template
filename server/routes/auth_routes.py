@@ -8,7 +8,7 @@ import jwt
 import pyotp
 import qrcode
 
-from mail import send_confirmation_email,send_account_locked_email, decode_email_token, create_email_token, send_reset_password_email, create_reset_token, decode_reset_token
+from mail import send_confirmation_email,send_account_locked_email, decode_email_token, create_email_token, send_reset_password_email, create_reset_token, decode_reset_token, send_login_notification
 from server.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm, ReactivateAccountForm, ResendConfirmationForm, TOTPForm
 from utils import enforce_password_history_limit
 from database import db
@@ -129,6 +129,9 @@ def login():
             )
             db.session.add(session_event)
             db.session.commit()
+
+            # Enviar notificación de inicio de sesión
+            send_login_notification(user, request.remote_addr)
 
             current_app.logger.info('User logged in: %s', email)
             flash('Login successful. Welcome back!', 'success')

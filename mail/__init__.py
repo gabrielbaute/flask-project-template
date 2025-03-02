@@ -6,3 +6,6 @@ from .auth_mail import(
     send_reset_password_email,
     create_reset_token,
     decode_reset_token)
+
+from .notifications_mail import(
+    send_login_notification)
