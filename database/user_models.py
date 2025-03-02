@@ -24,3 +24,12 @@ class PasswordHistory(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     user = db.relationship('User', backref=db.backref('password_history', lazy='dynamic'))
+
+class SessionHistory(db.Model):
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    usuario_id = db.Column(db.String(36), db.ForeignKey('user.id'), nullable=False)
+    tipo_evento = db.Column(db.String(10), nullable=False)  # LOGIN o LOGOUT
+    fecha_evento = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    ip_origen = db.Column(db.String(45), nullable=False)  # Dirección IPv4/IPv6
+    dispositivo = db.Column(db.String(50), nullable=True)  # PC, Android, iPhone, etc.
+    navegador = db.Column(db.String(50), nullable=True)  # Chrome, Edge, etc.

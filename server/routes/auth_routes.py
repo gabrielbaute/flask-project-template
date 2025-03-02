@@ -9,9 +9,10 @@ import pyotp
 import qrcode
 
 from mail import send_confirmation_email,send_account_locked_email, decode_email_token, create_email_token, send_reset_password_email, create_reset_token, decode_reset_token
-from forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm, ReactivateAccountForm, ResendConfirmationForm, TOTPForm
+from server.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm, ReactivateAccountForm, ResendConfirmationForm, TOTPForm
 from utils import enforce_password_history_limit
-from database import db, User, PasswordHistory
+from database import db
+from database.user_models import User, PasswordHistory, SessionHistory
 
 auth_bp = Blueprint('auth', __name__)
 MAX_FAILED_ATTEMPTS = 5
@@ -117,6 +118,18 @@ def login():
 
             login_user(user)
             session['user_id'] = user.id
+            
+            # Registrar el evento de inicio de sesión
+            session_event = SessionHistory(
+                usuario_id=user.id,
+                tipo_evento='LOGIN',
+                ip_origen=request.remote_addr,
+                dispositivo=request.user_agent.platform,
+                navegador=request.user_agent.browser
+            )
+            db.session.add(session_event)
+            db.session.commit()
+
             current_app.logger.info('User logged in: %s', email)
             flash('Login successful. Welcome back!', 'success')
             return redirect(url_for('main.home'))
@@ -146,9 +159,21 @@ def login():
 @auth_bp.route('/logout', methods=['POST', 'GET'])
 @login_required
 def logout():
+    # Registrar evento de cierre de sesión
+    session_event = SessionHistory(
+        usuario_id=current_user.id,
+        tipo_evento='LOGOUT',
+        ip_origen=request.remote_addr,
+        dispositivo=request.user_agent.platform,
+        navegador=request.user_agent.browser
+    )
+    db.session.add(session_event)
+    db.session.commit()
+
+    # Cerrar la sesión del usuario
     logout_user()
     session.pop('user_id', None)
-    current_app.logger.info('User logged out') # Usar current_app.logger.info en caso de registrar eventos en el log
+    current_app.logger.info('User logged out')  # Registrar en el log
     flash('You have been logged out.', 'success')
     return redirect(url_for('auth.login'))
 

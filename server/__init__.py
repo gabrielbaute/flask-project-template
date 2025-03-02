@@ -4,6 +4,7 @@ from flask import Flask, render_template
 from flask_migrate import Migrate
 from config import Config
 from database import init_db, db
+from database.user_models import User
 from server.routes.register_blueprints import register_blueprints
 from server.create_admin import create_admin_user
 from server.extensions import login_manager, jwt, mail
@@ -12,7 +13,6 @@ from server.oidc.google_login import init_oauth as init_google_oauth
 from server.oidc.github_login import init_oauth as init_github_oauth
 from server.oidc.microsoft_login import init_oauth as init_microsoft_oauth
 from server.api import api_bp
-from database import User
 
 def create_app():
     app = Flask(__name__,

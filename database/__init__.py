@@ -1,5 +1,4 @@
 from flask_sqlalchemy import SQLAlchemy
-from .user_models import User, PasswordHistory
 
 db = SQLAlchemy()
 

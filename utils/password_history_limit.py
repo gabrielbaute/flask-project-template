@@ -1,4 +1,5 @@
-from database import db, PasswordHistory
+from database import db
+from database.user_models import PasswordHistory
 
 def enforce_password_history_limit(user, max_history=3):
     if user.password_history.count() > max_history:
