@@ -9,6 +9,8 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
     is_active = db.Column(db.Boolean, default=False)
+    failed_login_attempts = db.Column(db.Integer, default=0)  # Contador de intentos fallidos
+    last_failed_login = db.Column(db.DateTime, nullable=True)  # Fecha del último intento fallido
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def __repr__(self):
