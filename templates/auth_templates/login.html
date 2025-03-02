@@ -24,6 +24,10 @@
     </div>
   </div>
 </form>
+<div class="container">
+  <p><a href="{{ url_for('auth.forgot_password') }}">¿Olvidó su contraseña?</a></p>
+  <p><a href="{{ url_for('auth.register') }}">Crear cuenta</a></p>
+</div>
 <div>
   <a class="button is-info" href="{{ url_for('google_login.google_login') }}">Login with Google</a>
   <a class="button is-info" href="{{ url_for('github_login.github_login') }}">Login with GitHub</a>

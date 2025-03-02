@@ -7,7 +7,8 @@ import jwt
 
 from mail import send_confirmation_email,send_account_locked_email, decode_email_token, create_email_token, send_reset_password_email, create_reset_token, decode_reset_token
 from server.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm, ReactivateAccountForm
-from database.models import User
+from database.models import User, PasswordHistory
+from utils import enforce_password_history_limit
 from database import db
 
 auth_bp = Blueprint('auth', __name__)
@@ -53,7 +54,13 @@ def confirm_email(token):
         flash('Account already confirmed. Please log in.', 'success')
         return redirect(url_for('auth.login'))
 
+    # Activar la cuenta del usuario
     user.is_active = True
+
+    # Registrar la contraseña inicial en el historial
+    password_history = PasswordHistory(user_id=user.id, password_hash=user.password)
+    db.session.add(password_history)
+
     db.session.commit()
     flash('Your account has been confirmed. You can now log in.', 'success')
     return redirect(url_for('auth.login'))
@@ -136,9 +143,25 @@ def reset_password(token):
     if form.validate_on_submit():
         password = form.password.data
         user = User.query.get(user_id)
+
+        # Verificar que la contraseña no haya sido utilizada antes
+        for old_password in user.password_history:
+            if check_password_hash(old_password.password_hash, password):
+                flash('You cannot reuse a previous password. Please choose a different one.', 'danger')
+                return redirect(url_for('auth.reset_password', token=token))
+
+        # Actualizar la contraseña del usuario
         user.password = generate_password_hash(password, method='pbkdf2:sha256')
         user.failed_login_attempts = 0
         user.is_active = True
+
+        # Guardar en el historial de contraseñas
+        new_password_history = PasswordHistory(user_id=user.id, password_hash=user.password)
+        db.session.add(new_password_history)
+
+        # Limitar el historial a las últimas N contraseñas
+        enforce_password_history_limit(user, max_history=3)
+
         db.session.commit()
         flash('Your password has been reset. You can now log in.', 'success')
         return redirect(url_for('auth.login'))

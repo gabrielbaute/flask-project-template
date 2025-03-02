@@ -15,3 +15,11 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return f'<User {self.username}>'
+
+class PasswordHistory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String(36), db.ForeignKey('user.id'), nullable=False)
+    password_hash = db.Column(db.String(150), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', backref=db.backref('password_history', lazy='dynamic'))
