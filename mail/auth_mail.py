@@ -17,6 +17,11 @@ def send_reset_password_email(user):
     msg.html = render_template('email_templates/reset_password.html', username=user.username, token=token)
     mail.send(msg)
 
+def send_account_locked_email(user):
+    msg = Message('Your Account Has Been Locked', recipients=[user.email])
+    msg.html = render_template('email_templates/account_locked.html', username=user.username)
+    mail.send(msg)
+
 def create_email_token(user_id):
     token = jwt.encode({
         'user_id': user_id,
