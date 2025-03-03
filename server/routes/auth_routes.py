@@ -7,7 +7,7 @@ from io import BytesIO
 import jwt, json, pyotp, qrcode, logging
 
 from mail import send_confirmation_email,send_account_locked_email, decode_email_token, create_email_token, send_reset_password_email, create_reset_token, decode_reset_token, send_login_notification, send_enable_2fa_notification, send_disable_2fa_notification, send_welcome_email, send_account_activation_email, send_password_change_notification
-from server.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm, ReactivateAccountForm, ResendConfirmationForm, TOTPForm
+from server.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm, ReactivateAccountForm, ResendConfirmationForm, TOTPForm, Disable2FAForm
 from utils import enforce_password_history_limit, registrar_auditoria, ACCIONES
 from database import db
 from database.user_models import User, PasswordHistory, SessionHistory
@@ -358,7 +358,20 @@ def verify_2fa():
     if form.validate_on_submit():
         totp = pyotp.TOTP(current_user.totp_secret)
         if totp.verify(form.totp_code.data):
-            session['2fa_verified'] = True
+            current_user.is_2fa_enabled = True  # Activar 2FA al verificar el código
+            db.session.commit()
+
+            # Registrar la auditoría
+            registrar_auditoria(
+                usuario_id=current_user.id,
+                accion=ACCIONES["HABILITAR_2FA"],
+                detalles=json.dumps({
+                    "ip_origen": request.remote_addr,
+                    "dispositivo": request.user_agent.platform,
+                    "user_agent": request.headers.get('User-Agent')
+                }),
+            )
+
             send_enable_2fa_notification(current_user)
             logging.info(f"2FA enabled for user {current_user.email}")
             flash('Two-Factor Authentication verified successfully!', 'success')
@@ -368,10 +381,13 @@ def verify_2fa():
 
     return render_template('auth_templates/verify_2fa.html', form=form)
 
+
 @auth_bp.route('/disable_2fa', methods=['GET', 'POST'])
 @login_required
 def disable_2fa():
-    if request.method == 'POST':
+    form = Disable2FAForm()
+
+    if form.validate_on_submit():  # Confirmar deshabilitación
         # Registrar la acción de deshabilitar 2FA
         registrar_auditoria(
             usuario_id=current_user.id,
@@ -392,7 +408,7 @@ def disable_2fa():
         flash('Two-Factor Authentication has been disabled.', 'success')
         return redirect(url_for('main.home'))
 
-    return render_template('auth_templates/disable_2fa.html')
+    return render_template('auth_templates/disable_2fa.html', form=form)
 
 @auth_bp.route('/protected', methods=['GET'])
 @jwt_required()

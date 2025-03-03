@@ -1,17 +1,20 @@
-{% extends 'auth_templates/auth_base.html' %}
+{% extends 'main_templates/base.html' %}
 
 {% block title %}Disable 2FA{% endblock %}
 
 {% block content %}
-<h2 class="title is-2">Disable Two-Factor Authentication</h2>
-<p>Are you sure you want to disable 2FA? This will reduce the security of your account.</p>
-<form method="POST" class="box">
-  {{ form.hidden_tag() }}
-  <div class="field">
-    <div class="control">
-      {{ form.submit(class="button is-danger") }}
-    </div>
+<section class="section">
+  <div class="container">
+    <h1 class="title">Disable Two-Factor Authentication</h1>
+    <p class="has-text-danger">
+      Are you sure you want to disable Two-Factor Authentication for your account? 
+      This will reduce the security of your account.
+    </p>
+    <form method="POST" action="{{ url_for('auth.disable_2fa') }}">
+      {{ form.hidden_tag() }}
+      <button class="button is-danger" type="submit">Yes, Disable 2FA</button>
+      <a href="{{ url_for('main.home') }}" class="button is-light">Cancel</a>
+    </form>
   </div>
-</form>
-<a href="{{ url_for('main.profile') }}" class="button">Cancel</a>
+</section>
 {% endblock %}

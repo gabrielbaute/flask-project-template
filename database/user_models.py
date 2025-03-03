@@ -16,6 +16,7 @@ class User(UserMixin, db.Model):
     last_failed_login = db.Column(db.DateTime, nullable=True)  # Fecha del último intento fallido
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow) # Fecha de creación
     totp_secret = db.Column(db.String(32), nullable=True)   # Clave para autenticación de dos factores
+    is_2fa_enabled = db.Column(db.Boolean, default=False)  # Campo para reflejar el estado de 2FA
 
     # Otros datos del usuario
     primer_nombre = db.Column(db.String(150), nullable=True)

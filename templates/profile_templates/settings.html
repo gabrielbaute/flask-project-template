@@ -1,0 +1,47 @@
+{% extends 'main_templates/base.html' %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<!-- Formulario para cambiar la contraseña -->
+<div class="box">
+  <h2 class="title is-5">Change Password</h2>
+  <form method="POST" action="{{ url_for('profile.change_password') }}">
+    {{ change_password_form.hidden_tag() }}
+    {{ change_password_form.current_password.label }}
+    {{ change_password_form.current_password(class="input") }}
+    {{ change_password_form.new_password.label }}
+    {{ change_password_form.new_password(class="input") }}
+    {{ change_password_form.confirm_password.label }}
+    {{ change_password_form.confirm_password(class="input") }}
+    {{ change_password_form.submit(class="button is-primary") }}
+  </form>
+</div>
+
+<div class="box">
+  <h2 class="title is-5">Two-Factor Authentication (2FA)</h2>
+  {% if user.is_2fa_enabled %}
+    <p>2FA is currently <strong>enabled</strong> on your account.</p>
+    <a href="{{ url_for('auth.disable_2fa') }}" class="button is-warning">Disable 2FA</a>
+  {% else %}
+    <p>2FA is currently <strong>disabled</strong> on your account.</p>
+    <a href="{{ url_for('auth.enable_2fa') }}" class="button is-success">Enable 2FA</a>
+  {% endif %}
+</div>
+
+
+<!-- Formulario para cambiar el correo -->
+<div class="box">
+  <h2 class="title is-5">Change Email Address</h2>
+  {% if has_2fa %}
+    <form method="POST" action="{{ url_for('profile.change_email') }}">
+      {{ change_email_form.hidden_tag() }}
+      {{ change_email_form.new_email.label }}
+      {{ change_email_form.new_email(class="input") }}
+      {{ change_email_form.submit(class="button is-primary") }}
+    </form>
+  {% else %}
+    <p class="has-text-danger">You must enable 2FA to change your email address.</p>
+  {% endif %}
+</div>
+{% endblock %}

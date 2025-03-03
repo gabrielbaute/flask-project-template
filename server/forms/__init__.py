@@ -1,8 +1,16 @@
-from .login_form import LoginForm
-from .register_form import RegisterForm
-from .forgot_password_form import ForgotPasswordForm
-from .reset_password_form import ResetPasswordForm
-from .reactivate_account_form import ReactivateAccountForm
-from .resend_confirmation import ResendConfirmationForm
-from .totp_form import TOTPForm
 from .profile_forms import UploadPhotoForm
+
+from .settings_forms import(
+    ChangePasswordForm,
+    ChangeEmailForm,
+    Enable2FAForm,
+    Disable2FAForm)
+
+from .auth_forms import(
+    LoginForm,
+    RegisterForm,
+    ResendConfirmationForm,
+    ForgotPasswordForm,
+    ResetPasswordForm,
+    TOTPForm,
+    ReactivateAccountForm)
