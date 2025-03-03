@@ -1,4 +1,6 @@
-from .profile_forms import UploadPhotoForm
+from .profile_forms import(
+    UploadPhotoForm,
+    EditProfileForm)
 
 from .settings_forms import(
     ChangePasswordForm,

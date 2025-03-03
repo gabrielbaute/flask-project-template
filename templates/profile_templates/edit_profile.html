@@ -1,0 +1,85 @@
+{% extends 'main_templates/base.html' %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h1 class="title">Edit Profile</h1>
+        <div class="columns">
+            <!-- Columna 1: Foto y datos personales -->
+            {% include 'main_templates/partials/user_info_card.html' %}
+        
+            <!-- Formulario o configuraciones de usuario -->
+            <div class="column">
+                <form method="POST" enctype="multipart/form-data" action="{{ url_for('profile.edit_profile') }}">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="field">
+                    {{ form.primer_nombre.label }}
+                    <div class="control">
+                        {{ form.primer_nombre(class="input", placeholder="Enter your first name") }}
+                    </div>
+                    </div>
+                    
+                    <div class="field">
+                    {{ form.segundo_nombre.label }}
+                    <div class="control">
+                        {{ form.segundo_nombre(class="input", placeholder="Enter your middle name") }}
+                    </div>
+                    </div>
+            
+                    <div class="field">
+                    {{ form.primer_apellido.label }}
+                    <div class="control">
+                        {{ form.primer_apellido(class="input", placeholder="Enter your first lastname") }}
+                    </div>
+                    </div>
+            
+                    <div class="field">
+                    {{ form.segundo_apellido.label }}
+                    <div class="control">
+                        {{ form.segundo_apellido(class="input", placeholder="Enter your second lastname") }}
+                    </div>
+                    </div>
+            
+                    <div class="field">
+                    {{ form.documento_de_identidad.label }}
+                    <div class="control">
+                        {{ form.documento_de_identidad(class="input", placeholder="Enter your ID (only numbers)") }}
+                    </div>
+                    </div>
+            
+                    <div class="field">
+                    {{ form.telefono.label }}
+                    <div class="control">
+                        {{ form.telefono(class="input", placeholder="Enter your phonenumber") }}
+                    </div>
+                    </div>
+            
+                    <div class="field">
+                    {{ form.fecha_nacimiento.label }}
+                    <div class="control">
+                        {{ form.fecha_nacimiento(class="input") }}
+                    </div>
+                    </div>
+            
+                    <div class="field">
+                    {{ form.foto_perfil.label }}
+                    <div class="control">
+                        {{ form.foto_perfil(class="file-input") }}
+                    </div>
+                    </div>
+            
+                    <div class="field">
+                    <div class="control">
+                        {{ form.submit(class="button is-primary") }}
+                    </div>
+                    </div>
+                </form>
+            </div>
+                
+        </div>
+    </div>
+</section>
+{% endblock %}

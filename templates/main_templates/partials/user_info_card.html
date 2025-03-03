@@ -1,0 +1,28 @@
+<div class="column is-one-third">
+    <div class="card">
+      <div class="card-content">
+        <div class="media">
+          <div class="media-left">
+            <figure class="image is-48x48">
+              <a href="{{ url_for('profile.view_profile') }}"><img class="is-rounded" src="{{ url_for('profile.serve_profile_photo') }}" alt="Profile Thumbnail"></a>
+            </figure>
+          </div>
+          <div class="media-content">
+            <p class="title is-4"><a href="{{ url_for('profile.view_profile') }}">{{ user.username }}</a></p>
+            <p class="subtitle is-6">{{ user.email }}</p>
+          </div>
+        </div>
+  
+        <div class="content">
+          <p><strong>First Name:</strong> {{ user.primer_nombre or "Not provided" }}</p>
+          <p><strong>Last Name:</strong> {{ user.primer_apellido or "Not provided" }}</p>
+          <p><strong>Phone:</strong> {{ user.telefono or "Not provided" }}</p>
+          <p><strong>Date of Birth:</strong> {{ user.fecha_nacimiento or "Not provided" }}</p>
+          <div class="block">
+            <a href="{{ url_for('profile.edit_profile') }}" class="button is-info is-light">Edit Profile</a>
+            <a href="{{ url_for('profile.settings') }}" class="button is-info is-light">User Settings</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>  

@@ -7,7 +7,7 @@ import logging, pyotp, os
 from database import db
 from database.user_models import User
 from utils import create_user_folder, allowed_file, unique_filename
-from server.forms import UploadPhotoForm, ChangePasswordForm, ChangeEmailForm, Enable2FAForm, Disable2FAForm
+from server.forms import UploadPhotoForm, ChangePasswordForm, ChangeEmailForm, Enable2FAForm, Disable2FAForm, EditProfileForm
 
 profile_bp = Blueprint('profile', __name__)
 
@@ -134,3 +134,44 @@ def change_email():
     else:
         flash("Invalid form submission", "danger")
     return redirect(url_for('profile.settings'))
+
+@profile_bp.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    # Prellenar el formulario con la información actual del usuario
+    form = EditProfileForm(obj=current_user)
+
+    if form.validate_on_submit():
+        # Actualizar solo los campos que tienen datos nuevos
+        if form.primer_nombre.data:
+            current_user.primer_nombre = form.primer_nombre.data
+        if form.segundo_nombre.data:
+            current_user.segundo_nombre = form.segundo_nombre.data
+        if form.primer_apellido.data:
+            current_user.primer_apellido = form.primer_apellido.data
+        if form.segundo_apellido.data:
+            current_user.segundo_apellido = form.segundo_apellido.data
+        if form.documento_de_identidad.data:
+            current_user.documento_de_identidad = form.documento_de_identidad.data
+        if form.telefono.data:
+            current_user.telefono = form.telefono.data
+        if form.fecha_nacimiento.data:
+            current_user.fecha_nacimiento = form.fecha_nacimiento.data
+
+        # Manejar la subida de la foto de perfil
+        if form.foto_perfil.data:
+            file = form.foto_perfil.data
+            filename = secure_filename(file.filename)
+            user_folder = create_user_folder(current_user.id)
+            filepath = os.path.join(user_folder, filename)
+            file.save(filepath)
+            current_user.foto_perfil = filename
+
+        # Guardar los cambios en la base de datos
+        db.session.commit()
+
+        logging.info(f"Profile updated for user {current_user.email}")
+        flash('Your profile has been updated successfully!', 'success')
+        return redirect(url_for('profile.view_profile'))
+
+    return render_template('profile_templates/edit_profile.html', form=form, user=current_user)
