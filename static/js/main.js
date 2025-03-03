@@ -1,5 +1,30 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Seleccionamos los tabs y los contenidos asociados
+  // Seleccionar el botón de hamburguesa y el menú correspondiente
+  const burger = document.querySelector('.navbar-burger');
+  const menu = document.querySelector('.navbar-menu');
+
+  if (burger && menu) {
+    // Agregar un evento 'click' al botón de hamburguesa
+    burger.addEventListener('click', () => {
+      // Alternar las clases 'is-active' en el botón y en el menú
+      burger.classList.toggle('is-active');
+      menu.classList.toggle('is-active');
+    });
+  }
+
+  // Lógica para desplegar los dropdowns dentro del menú
+  const dropdowns = document.querySelectorAll('.navbar-item.has-dropdown');
+  dropdowns.forEach(dropdown => {
+    const trigger = dropdown.querySelector('.navbar-link');
+    if (trigger) {
+      trigger.addEventListener('click', (e) => {
+        e.preventDefault(); // Evitar que el enlace recargue la página
+        dropdown.classList.toggle('is-active');
+      });
+    }
+  });
+
+  // Seleccionar tabs y contenidos asociados
   const tabs = document.querySelectorAll('.tabs li');
   const tabContents = document.querySelectorAll('.column > div[id]');
 

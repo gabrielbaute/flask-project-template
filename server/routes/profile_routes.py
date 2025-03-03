@@ -80,7 +80,7 @@ def settings():
     change_email_form = ChangeEmailForm()
 
     # Verificar si el usuario tiene 2FA activado
-    has_2fa = current_user.totp_secret is not None
+    has_2fa = current_user.is_2fa_enabled is not False
 
     return render_template(
         'profile_templates/settings.html',
