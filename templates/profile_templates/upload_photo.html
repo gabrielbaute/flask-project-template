@@ -1,0 +1,28 @@
+{% extends 'main_templates/base.html' %}
+
+{% block title %}Upload Profile Photo{% endblock %}
+
+{% block content %}
+<h2 class="title is-2">Upload Your Profile Photo</h2>
+<p>Please upload a photo in JPG, JPEG, or PNG format.</p>
+
+<form method="POST" enctype="multipart/form-data" class="box">
+  {{ form.hidden_tag() }}
+  
+  <div class="field">
+    <label class="label">{{ form.photo.label }}</label>
+    <div class="control">
+      {{ form.photo(class="input") }}
+    </div>
+    {% for error in form.photo.errors %}
+      <p class="help is-danger">{{ error }}</p>
+    {% endfor %}
+  </div>
+  
+  <div class="field">
+    <div class="control">
+      {{ form.submit(class="button is-primary") }}
+    </div>
+  </div>
+</form>
+{% endblock %}

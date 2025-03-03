@@ -5,3 +5,4 @@ from .reset_password_form import ResetPasswordForm
 from .reactivate_account_form import ReactivateAccountForm
 from .resend_confirmation import ResendConfirmationForm
 from .totp_form import TOTPForm
+from .profile_forms import UploadPhotoForm

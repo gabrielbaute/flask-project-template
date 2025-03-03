@@ -20,6 +20,10 @@ class Config:
     PORT=os.environ.get("PORT")
     DEBUG=os.environ.get("DEBUG")
 
+    # Almacenamiento de archivos
+    UPLOAD_FOLDER=os.environ.get('UPLOAD_FOLDER', 'instance/uploads')
+    MAX_CONTENT_LENGTH = int(os.environ.get('MAX_CONTENT_LENGTH')) * 1024 * 1024
+
     # Variables de entorno para el administrador
     ADMIN_USERNAME=os.environ.get('ADMIN_USERNAME') or 'admin'
     ADMIN_EMAIL=os.environ.get('ADMIN_EMAIL') or 'admin@example.com'
