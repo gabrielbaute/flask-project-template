@@ -27,7 +27,6 @@ def upload_photo():
 
         # Guardar el archivo
         file.save(file_path)
-        print(f"Saved file to: {file_path}")
 
         # Actualizar el modelo del usuario con el nombre del archivo
         current_user.foto_perfil = filename
@@ -46,19 +45,14 @@ def upload_photo():
 @login_required
 def serve_profile_photo():
     if not current_user.foto_perfil:
-        print("User has no profile photo. Serving default image.")
         return current_app.send_static_file('img/default_profile.png')
 
     user_folder = create_user_folder(current_user.id)
-    file_path = os.path.normpath(os.path.join(user_folder, current_user.foto_perfil))
-
-    print(f"Attempting to serve file: {file_path}")
+    file_path = os.path.normpath(os.path.join(user_folder, current_user.foto_perfil))    
 
     if not os.path.exists(file_path):
-        print(f"File not found: {file_path}. Serving default image.")
         return current_app.send_static_file('img/default_profile.png')
 
-    print(f"File found. Serving: {file_path}")
     return send_file(file_path)
 
 
