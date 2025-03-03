@@ -329,7 +329,6 @@ def enable_2fa():
                 "user_agent": request.headers.get('User-Agent')
             }),
         )
-        send_enable_2fa_notification(user)
 
     # Renderizar la plantilla con el QR generado dinámicamente desde get_qr_code
     return render_template('auth_templates/enable_2fa.html', user_id=user.id)
@@ -359,6 +358,7 @@ def verify_2fa():
         totp = pyotp.TOTP(current_user.totp_secret)
         if totp.verify(form.totp_code.data):
             session['2fa_verified'] = True
+            send_enable_2fa_notification(current_user)
             flash('Two-Factor Authentication verified successfully!', 'success')
             return redirect(url_for('main.home'))
         else:
