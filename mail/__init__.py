@@ -14,4 +14,5 @@ from .notifications_mail import(
     send_enable_2fa_notification,
     send_disable_2fa_notification,
     send_account_activation_email,
-    send_welcome_email)
+    send_welcome_email,
+    send_password_change_notification)

@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from io import BytesIO
 import jwt, json, pyotp, qrcode
 
-from mail import send_confirmation_email,send_account_locked_email, decode_email_token, create_email_token, send_reset_password_email, create_reset_token, decode_reset_token, send_login_notification, send_enable_2fa_notification, send_disable_2fa_notification, send_welcome_email, send_account_activation_email
+from mail import send_confirmation_email,send_account_locked_email, decode_email_token, create_email_token, send_reset_password_email, create_reset_token, decode_reset_token, send_login_notification, send_enable_2fa_notification, send_disable_2fa_notification, send_welcome_email, send_account_activation_email, send_password_change_notification
 from server.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm, ReactivateAccountForm, ResendConfirmationForm, TOTPForm
 from utils import enforce_password_history_limit, registrar_auditoria, ACCIONES
 from database import db
@@ -270,6 +270,7 @@ def reset_password(token):
         )
 
         db.session.commit()
+        send_password_change_notification(user, request.remote_addr)
         flash('Your password has been reset. You can now log in.', 'success')
         return redirect(url_for('auth.login'))
 

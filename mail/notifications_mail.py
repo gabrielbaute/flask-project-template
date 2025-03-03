@@ -97,3 +97,21 @@ def send_account_activation_email(user):
         username=user.username
     )
     mail.send(msg)
+
+def send_password_change_notification(user, ip_address):
+    """
+    Envía una notificación por email al usuario cuando se detecta que la contraseña ha sido cambiada.
+    """
+    device = request.user_agent.platform
+    browser = request.user_agent.browser
+
+    # Renderizar la plantilla con los datos
+    msg = Message('Your password has been changed', recipients=[user.email])
+    msg.html = render_template(
+        'email_templates/password_changed_notification.html',
+        username=user.username,
+        ip_address=ip_address,
+        device=device,
+        browser=browser
+    )
+    mail.send(msg)
