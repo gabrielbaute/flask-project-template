@@ -9,6 +9,10 @@ load_dotenv()
 
 BASE_DIR=os.path.abspath(os.path.dirname(__file__))
 
+# Función para convertir una cadena a un valor booleano
+def str_to_bool(value):
+    return value.lower() in ['true', '1', 'yes']
+
 class Config:
     """Configuración de la aplicación Flask."""
 
@@ -52,10 +56,10 @@ class Config:
     GITHUB_REDIRECT_URI = os.environ.get('GITHUB_REDIRECT_URI')
 
     # Configuración de Flask-Mail
-    MAIL_SERVER = 'smtp.gmail.com'
-    MAIL_PORT = 587
-    MAIL_USE_TLS = True
-    MAIL_USE_SSL = False
+    MAIL_SERVER = os.environ.get('MAIL_SERVER')
+    MAIL_PORT = os.environ.get('MAIL_PORT')
+    MAIL_USE_TLS = str_to_bool(os.environ.get('MAIL_USE_TLS', 'False'))
+    MAIL_USE_SSL = str_to_bool(os.environ.get('MAIL_USE_SSL', 'False'))
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER')
