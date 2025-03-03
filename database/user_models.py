@@ -33,3 +33,14 @@ class SessionHistory(db.Model):
     ip_origen = db.Column(db.String(45), nullable=False)  # Dirección IPv4/IPv6
     dispositivo = db.Column(db.String(50), nullable=True)  # PC, Android, iPhone, etc.
     navegador = db.Column(db.String(50), nullable=True)  # Chrome, Edge, etc.
+
+class AuditLog(db.Model):
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    usuario_id = db.Column(db.String(36), db.ForeignKey('user.id'), nullable=False)
+    accion = db.Column(db.String(50), nullable=False)  # Descripción de la acción
+    detalles = db.Column(db.Text, nullable=True)  # Información adicional (JSON o texto)
+    fecha_cambio = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    ip_origen = db.Column(db.String(45), nullable=False)  # IPv4/IPv6
+    dispositivo = db.Column(db.String(50), nullable=True)  # PC, Android, etc.
+    user_agent = db.Column(db.Text, nullable=True)  # Agente de usuario completo
+    observaciones = db.Column(db.Text, nullable=True)  # Comentarios adicionales

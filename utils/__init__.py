@@ -1,1 +1,3 @@
 from .password_history_limit import enforce_password_history_limit
+from .auditory_register import registrar_auditoria
+from .auditory_actions import ACCIONES

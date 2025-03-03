@@ -4,13 +4,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, set_access_cookies, unset_jwt_cookies, unset_access_cookies
 from datetime import datetime, timedelta
 from io import BytesIO
-import jwt
-import pyotp
-import qrcode
+import jwt, json, pyotp, qrcode
 
 from mail import send_confirmation_email,send_account_locked_email, decode_email_token, create_email_token, send_reset_password_email, create_reset_token, decode_reset_token, send_login_notification
 from server.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm, ReactivateAccountForm, ResendConfirmationForm, TOTPForm
-from utils import enforce_password_history_limit
+from utils import enforce_password_history_limit, registrar_auditoria, ACCIONES
 from database import db
 from database.user_models import User, PasswordHistory, SessionHistory
 
@@ -68,6 +66,18 @@ def confirm_email(token):
     db.session.add(password_history)
 
     db.session.commit()
+
+    # Registrar la acción de habilitar 2FA
+    registrar_auditoria(
+        usuario_id=user.id,
+        accion=ACCIONES["ACTIVACION"],
+        detalles=json.dumps({
+            "ip_origen": request.remote_addr,
+            "dispositivo": request.user_agent.platform,
+            "user_agent": request.headers.get('User-Agent')
+        }),
+    )
+
     flash('Your account has been confirmed. You can now log in.', 'success')
     return redirect(url_for('auth.login'))
 
@@ -149,9 +159,23 @@ def login():
         if user.failed_login_attempts >= MAX_FAILED_ATTEMPTS:
             user.is_active = False
             db.session.commit()
+
+            # **Registrar auditoría de bloqueo de cuenta**
+            registrar_auditoria(
+                usuario_id=user.id,
+                accion=ACCIONES["BLOQUEO_CUENTA"],
+                detalles=json.dumps({
+                    "intentos_fallidos": user.failed_login_attempts,
+                    "ip_origen": request.remote_addr,
+                    "dispositivo": request.user_agent.platform,
+                    "user_agent": request.headers.get('User-Agent')
+                }),
+            )
+
             send_account_locked_email(user)  # Notificación automática
             flash('Too many failed login attempts. Your account has been locked. Follow the instructions sent to your email.', 'danger')
             return redirect(url_for('auth.login'))
+
 
         db.session.commit()
         flash('Please check your login details and try again.', 'danger')
@@ -227,6 +251,17 @@ def reset_password(token):
         # Limitar el historial a las últimas N contraseñas
         enforce_password_history_limit(user, max_history=3)
 
+        # **Registrar la acción en la auditoría**
+        registrar_auditoria(
+            usuario_id=user.id,
+            accion=ACCIONES["CAMBIO_CONTRASENA"],
+            detalles=json.dumps({
+                "ip_origen": request.remote_addr,
+                "dispositivo": request.user_agent.platform,
+                "user_agent": request.headers.get('User-Agent'),
+            }),
+        )
+
         db.session.commit()
         flash('Your password has been reset. You can now log in.', 'success')
         return redirect(url_for('auth.login'))
@@ -246,10 +281,24 @@ def reactivate_account():
 
         # Enviar correo con token de restablecimiento
         send_reset_password_email(user)
+
+        # **Registrar auditoría de reactivación**
+        registrar_auditoria(
+            usuario_id=user.id,
+            accion=ACCIONES["REACTIVACION"],
+            detalles=json.dumps({
+                "email": email,
+                "ip_origen": request.remote_addr,
+                "dispositivo": request.user_agent.platform,
+                "user_agent": request.headers.get('User-Agent')
+            }),
+        )
+
         flash('If the email exists and the account is locked, you will receive a password reset email shortly.', 'success')
         return redirect(url_for('auth.login'))
 
     return render_template('auth_templates/reactivate_account.html', form=form)
+
 
 """
     Rutas para 2FA
@@ -262,6 +311,17 @@ def enable_2fa():
         # Generar un nuevo secreto TOTP si no existe
         user.totp_secret = pyotp.random_base32()
         db.session.commit()
+
+        # Registrar la acción de habilitar 2FA
+        registrar_auditoria(
+            usuario_id=user.id,
+            accion=ACCIONES["HABILITAR_2FA"],
+            detalles=json.dumps({
+                "ip_origen": request.remote_addr,
+                "dispositivo": request.user_agent.platform,
+                "user_agent": request.headers.get('User-Agent')
+            }),
+        )
 
     # Renderizar la plantilla con el QR generado dinámicamente desde get_qr_code
     return render_template('auth_templates/enable_2fa.html', user_id=user.id)
@@ -302,6 +362,18 @@ def verify_2fa():
 @login_required
 def disable_2fa():
     if request.method == 'POST':
+        # Registrar la acción de deshabilitar 2FA
+        registrar_auditoria(
+            usuario_id=current_user.id,
+            accion=ACCIONES["DESHABILITAR_2FA"],
+            detalles=json.dumps({
+                "ip_origen": request.remote_addr,
+                "dispositivo": request.user_agent.platform,
+                "user_agent": request.headers.get('User-Agent')
+            }),
+        )
+
+        # Eliminar el secreto TOTP
         current_user.totp_secret = None
         db.session.commit()
         flash('Two-Factor Authentication has been disabled.', 'success')
