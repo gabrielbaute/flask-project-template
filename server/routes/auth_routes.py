@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from io import BytesIO
 import jwt, json, pyotp, qrcode
 
-from mail import send_confirmation_email,send_account_locked_email, decode_email_token, create_email_token, send_reset_password_email, create_reset_token, decode_reset_token, send_login_notification
+from mail import send_confirmation_email,send_account_locked_email, decode_email_token, create_email_token, send_reset_password_email, create_reset_token, decode_reset_token, send_login_notification, send_enable_2fa_notification, send_disable_2fa_notification
 from server.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm, ReactivateAccountForm, ResendConfirmationForm, TOTPForm
 from utils import enforce_password_history_limit, registrar_auditoria, ACCIONES
 from database import db
@@ -322,6 +322,7 @@ def enable_2fa():
                 "user_agent": request.headers.get('User-Agent')
             }),
         )
+        send_enable_2fa_notification(user)
 
     # Renderizar la plantilla con el QR generado dinámicamente desde get_qr_code
     return render_template('auth_templates/enable_2fa.html', user_id=user.id)
@@ -372,6 +373,7 @@ def disable_2fa():
                 "user_agent": request.headers.get('User-Agent')
             }),
         )
+        send_disable_2fa_notification(current_user)
 
         # Eliminar el secreto TOTP
         current_user.totp_secret = None
