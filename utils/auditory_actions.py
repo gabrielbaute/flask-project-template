@@ -1,5 +1,5 @@
 ACCIONES = {
-    "CAMBIO_CONTRASEÑA": "Cambio de contraseña",
+    "CAMBIO_CONTRASENA": "Cambio de contraseña",
     "BLOQUEO_CUENTA": "Bloqueo de cuenta",
     "ACTIVACION": "Nueva cuenta activada",
     "REACTIVACION": "Solicitud de reactivación",

@@ -28,6 +28,8 @@ def create_user_folder(user_id):
     if not os.path.exists(user_folder):
         os.makedirs(user_folder)
 
+    print(user_folder)
+
     return user_folder
 
 def get_user_photo_path(user_id, filename):

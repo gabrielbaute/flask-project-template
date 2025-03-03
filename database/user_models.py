@@ -1,4 +1,5 @@
 from flask_login import UserMixin
+from sqlalchemy.orm import relationship
 from datetime import datetime
 from database import db
 import uuid
@@ -26,6 +27,20 @@ class User(UserMixin, db.Model):
     fecha_nacimiento = db.Column(db.Date, nullable=True)
     foto_perfil = db.Column(db.String(150), nullable=True)
 
+    # Relación con SessionHistory
+    session_history = relationship(
+        'SessionHistory',
+        backref='user',    # Permite acceder al usuario desde SessionHistory
+        lazy=True          # Carga perezosa de los datos relacionados
+    )
+
+    # Relación con SessionHistory
+    audit_logs = relationship(
+        'AuditLog',
+        backref='user',    # Permite acceder al usuario desde SessionHistory
+        lazy=True          # Carga perezosa de los datos relacionados
+    )
+    
     def __repr__(self):
         return f'<User {self.username}>'
 

@@ -1,0 +1,111 @@
+{% extends 'main_templates/base.html' %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h1 class="title">My Profile</h1>
+    <div class="columns">
+      <!-- Columna 1: Foto y datos personales -->
+      <div class="column is-one-third">
+        <div class="card">
+          <!-- Imagen de perfil -->
+           <!-- Aquí es donde se muestra la foto de perfil 
+          <div class="card-image">
+            <figure class="image is-128x128 is-centered">
+              <img class="" src="{{ url_for('profile.serve_profile_photo') }}" alt="Profile Photo">
+            </figure>
+          </div>
+          -->
+          <!-- Contenido de la card -->
+          <div class="card-content">
+            <div class="media">
+              <div class="media-left">
+                <figure class="image is-48x48">
+                  <img class="is-rounded" src="{{ url_for('profile.serve_profile_photo') }}" alt="Profile Thumbnail">
+                </figure>
+              </div>
+              <div class="media-content">
+                <p class="title is-4">{{ user.username }}</p>
+                <p class="subtitle is-6">{{ user.email }}</p>
+              </div>
+            </div>
+      
+            <div class="content">
+              <p><strong>First Name:</strong> {{ user.primer_nombre or "Not provided" }}</p>
+              <p><strong>Last Name:</strong> {{ user.primer_apellido or "Not provided" }}</p>
+              <p><strong>Phone:</strong> {{ user.telefono or "Not provided" }}</p>
+              <p><strong>Date of Birth:</strong> {{ user.fecha_nacimiento or "Not provided" }}</p>
+              <a href="{{ url_for('profile.upload_photo') }}" class="button is-info is-light">Edit Profile</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+
+      <!-- Columna 2: Tabs para Historial y Auditoría -->
+      <div class="column">
+        <div class="tabs">
+          <ul>
+            <li class="is-active"><a href="#profile">Profile</a></li>
+            <li><a href="#sessions">Session History</a></li>
+            <li><a href="#audit">Audit Logs</a></li>
+          </ul>
+        </div>
+
+        <div id="profile">
+          <h2 class="title is-4">Profile Details</h2>
+          <p>Here you can edit your personal details by clicking on "Edit Profile".</p>
+        </div>
+
+        <div id="sessions" class="is-hidden">
+          <h2 class="title is-4">Session History</h2>
+          <table class="table is-fullwidth">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>IP Address</th>
+                <th>Device</th>
+                <th>Browser</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for session in session_history %}
+              <tr>
+                <td>{{ session.timestamp }}</td>
+                <td>{{ session.ip_origen }}</td>
+                <td>{{ session.dispositivo or "Unknown" }}</td>
+                <td>{{ session.navegador or "Unknown" }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div id="audit" class="is-hidden">
+          <h2 class="title is-4">Audit Logs</h2>
+          <table class="table is-fullwidth">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Action</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for log in audit_logs %}
+              <tr>
+                <td>{{ log.fecha_cambio }}</td>
+                <td>{{ log.accion }}</td>
+                <td>{{ log.detalles }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

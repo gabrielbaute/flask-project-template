@@ -21,7 +21,7 @@ class Config:
     DEBUG=os.environ.get("DEBUG")
 
     # Almacenamiento de archivos
-    UPLOAD_FOLDER=os.environ.get('UPLOAD_FOLDER', 'instance/uploads')
+    UPLOAD_FOLDER=os.path.join(BASE_DIR, os.environ.get('UPLOAD_FOLDER', 'instance/uploads'))
     MAX_CONTENT_LENGTH = int(os.environ.get('MAX_CONTENT_LENGTH')) * 1024 * 1024
 
     # Variables de entorno para el administrador
