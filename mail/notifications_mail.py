@@ -64,3 +64,36 @@ def send_disable_2fa_notification(user):
         user_agent=user_agent
     )
     mail.send(msg)
+
+from flask_mail import Message
+from flask import render_template
+
+def send_welcome_email(user):
+    """
+    Envía un correo de bienvenida al usuario después de crear su cuenta.
+    """
+    # Configurar el mensaje
+    msg = Message(
+        subject="Welcome to [YourAppName]!",
+        recipients=[user.email]
+    )
+    msg.html = render_template(
+        "email_templates/welcome_email.html",
+        username=user.username
+    )
+    mail.send(msg)
+
+def send_account_activation_email(user):
+    """
+    Envía un correo al usuario después de que active su cuenta con éxito.
+    """
+    # Configurar el mensaje
+    msg = Message(
+        subject="Your account has been activated!",
+        recipients=[user.email]
+    )
+    msg.html = render_template(
+        "email_templates/account_activation_email.html",
+        username=user.username
+    )
+    mail.send(msg)

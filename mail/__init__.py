@@ -12,4 +12,6 @@ from .tokens_mail_generator import(
 from .notifications_mail import(
     send_login_notification,
     send_enable_2fa_notification,
-    send_disable_2fa_notification)
+    send_disable_2fa_notification,
+    send_account_activation_email,
+    send_welcome_email)

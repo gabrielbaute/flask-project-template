@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from io import BytesIO
 import jwt, json, pyotp, qrcode
 
-from mail import send_confirmation_email,send_account_locked_email, decode_email_token, create_email_token, send_reset_password_email, create_reset_token, decode_reset_token, send_login_notification, send_enable_2fa_notification, send_disable_2fa_notification
+from mail import send_confirmation_email,send_account_locked_email, decode_email_token, create_email_token, send_reset_password_email, create_reset_token, decode_reset_token, send_login_notification, send_enable_2fa_notification, send_disable_2fa_notification, send_welcome_email, send_account_activation_email
 from server.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm, ReactivateAccountForm, ResendConfirmationForm, TOTPForm
 from utils import enforce_password_history_limit, registrar_auditoria, ACCIONES
 from database import db
@@ -40,6 +40,10 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
+        # Enviar correo de bienvenida
+        send_welcome_email(new_user)
+
+        # Enviar correo de confirmación de cuenta
         send_confirmation_email(new_user)
         flash('A confirmation email has been sent to your email address. Please confirm your email to complete the registration.', 'success')
         return redirect(url_for('auth.login'))
@@ -77,6 +81,9 @@ def confirm_email(token):
             "user_agent": request.headers.get('User-Agent')
         }),
     )
+
+    # Enviar correo de activación exitosa
+    send_account_activation_email(user)
 
     flash('Your account has been confirmed. You can now log in.', 'success')
     return redirect(url_for('auth.login'))
