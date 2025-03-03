@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, set_access_cookies, unset_jwt_cookies, unset_access_cookies
 from datetime import datetime, timedelta
 from io import BytesIO
-import jwt, json, pyotp, qrcode
+import jwt, json, pyotp, qrcode, logging
 
 from mail import send_confirmation_email,send_account_locked_email, decode_email_token, create_email_token, send_reset_password_email, create_reset_token, decode_reset_token, send_login_notification, send_enable_2fa_notification, send_disable_2fa_notification, send_welcome_email, send_account_activation_email, send_password_change_notification
 from server.forms import LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm, ReactivateAccountForm, ResendConfirmationForm, TOTPForm
@@ -360,6 +360,7 @@ def verify_2fa():
         if totp.verify(form.totp_code.data):
             session['2fa_verified'] = True
             send_enable_2fa_notification(current_user)
+            logging.info(f"2FA enabled for user {current_user.email}")
             flash('Two-Factor Authentication verified successfully!', 'success')
             return redirect(url_for('main.home'))
         else:
@@ -386,6 +387,8 @@ def disable_2fa():
         # Eliminar el secreto TOTP
         current_user.totp_secret = None
         db.session.commit()
+
+        logging.warning(f"2FA disabled for user {current_user.email}")
         flash('Two-Factor Authentication has been disabled.', 'success')
         return redirect(url_for('main.home'))
 
