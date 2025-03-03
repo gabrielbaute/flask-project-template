@@ -1,14 +1,12 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Email Confirmation</title>
-  </head>
-  <body>
-    <p>Hi {{ username }},</p>
-    <p>Thank you for registering. Please click the link below to confirm your email address:</p>
-    <p><a href="{{ url_for('auth.confirm_email', token=token, _external=True) }}">Confirm Email</a></p>
-    <p>If you did not register, please ignore this email.</p>
-  </body>
-</html>
+{% extends 'email_templates/base_email.html' %}
+
+{% block title %}Email Confirmation{% endblock %}
+
+{% block header %}Confirm Your Email{% endblock %}
+
+{% block content %}
+<p>Hi {{ username }},</p>
+<p>Thank you for registering. Please click the link below to confirm your email address:</p>
+<p><a href="{{ url_for('auth.confirm_email', token=token, _external=True) }}">Confirm Email</a></p>
+<p>If you did not register, please ignore this email.</p>
+{% endblock %}

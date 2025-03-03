@@ -1,16 +1,13 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Account Locked</title>
-  </head>
-  <body>
-    <p>Hi {{ username }},</p>
-    <p>Your account has been locked due to too many failed login attempts.</p>
-    <p>If this was not intentional, you will need to reactivate your account. Please visit the following link to proceed:</p>
-    <p><a href="{{ url_for('auth.reactivate_account', _external=True) }}">Reactivate Account</a></p>
-    <p>If you did not attempt to log in, please contact our support team immediately.</p>
-    <p>Best regards,<br>The Support Team</p>
-  </body>
-</html>
+{% extends 'email_templates/base_email.html' %}
+
+{% block title %}Account Locked{% endblock %}
+
+{% block header %}Your Account Has Been Locked{% endblock %}
+
+{% block content %}
+<p>Hi {{ username }},</p>
+<p>Your account has been locked due to too many failed login attempts.</p>
+<p>If this was not intentional, you will need to reactivate your account. Please visit the following link to proceed:</p>
+<p><a href="{{ url_for('auth.reactivate_account', _external=True) }}">Reactivate Account</a></p>
+<p>If you did not attempt to log in, please contact our support team immediately.</p>
+{% endblock %}
