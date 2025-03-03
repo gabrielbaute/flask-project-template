@@ -8,11 +8,23 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(150), unique=True, nullable=False)
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
-    is_active = db.Column(db.Boolean, default=False)
+
+    # Campos de control de acceso
+    is_active = db.Column(db.Boolean, default=False)  # Activo o inactivo
     failed_login_attempts = db.Column(db.Integer, default=0)  # Contador de intentos fallidos
     last_failed_login = db.Column(db.DateTime, nullable=True)  # Fecha del último intento fallido
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    totp_secret = db.Column(db.String(32), nullable=True)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow) # Fecha de creación
+    totp_secret = db.Column(db.String(32), nullable=True)   # Clave para autenticación de dos factores
+
+    # Otros datos del usuario
+    primer_nombre = db.Column(db.String(150), nullable=True)
+    segundo_nombre = db.Column(db.String(150), nullable=True)
+    primer_apellido = db.Column(db.String(150), nullable=True)
+    segundo_apellido = db.Column(db.String(150), nullable=True)
+    documento_de_identidad = db.Column(db.String(20), nullable=True)
+    telefono = db.Column(db.String(20), nullable=True)
+    fecha_nacimiento = db.Column(db.Date, nullable=True)
+    foto_perfil = db.Column(db.String(150), nullable=True)
 
     def __repr__(self):
         return f'<User {self.username}>'
@@ -25,6 +37,9 @@ class PasswordHistory(db.Model):
 
     user = db.relationship('User', backref=db.backref('password_history', lazy='dynamic'))
 
+    def __repr__(self):
+        return f'<PasswordHistory {self.user_id}>'
+
 class SessionHistory(db.Model):
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     usuario_id = db.Column(db.String(36), db.ForeignKey('user.id'), nullable=False)
@@ -33,6 +48,9 @@ class SessionHistory(db.Model):
     ip_origen = db.Column(db.String(45), nullable=False)  # Dirección IPv4/IPv6
     dispositivo = db.Column(db.String(50), nullable=True)  # PC, Android, iPhone, etc.
     navegador = db.Column(db.String(50), nullable=True)  # Chrome, Edge, etc.
+
+    def __repr__(self):
+        return f'<SessionHistory {self.usuario_id}>'
 
 class AuditLog(db.Model):
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
@@ -44,3 +62,6 @@ class AuditLog(db.Model):
     dispositivo = db.Column(db.String(50), nullable=True)  # PC, Android, etc.
     user_agent = db.Column(db.Text, nullable=True)  # Agente de usuario completo
     observaciones = db.Column(db.Text, nullable=True)  # Comentarios adicionales
+
+    def __repr__(self):
+        return f'<SessionHistory {self.usuario_id}>'
