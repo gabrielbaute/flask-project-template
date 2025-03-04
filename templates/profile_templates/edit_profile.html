@@ -36,69 +36,90 @@
                 <!-- Formulario de edición de perfil -->
                 <form method="POST" enctype="multipart/form-data" action="{{ url_for('profile.edit_profile') }}">
                     {{ form.hidden_tag() }}
-                    
+                
                     <div class="field">
-                    {{ form.primer_nombre.label }}
-                    <div class="control">
-                        {{ form.primer_nombre(class="input", placeholder="Enter your first name") }}
+                        {{ form.primer_nombre.label }}
+                        <div class="control has-icons-left">
+                            {{ form.primer_nombre(class="input", placeholder="Enter your first name") }}
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-user"></i>
+                            </span>
+                        </div>
                     </div>
-                    </div>
-                    
+                
                     <div class="field">
-                    {{ form.segundo_nombre.label }}
-                    <div class="control">
-                        {{ form.segundo_nombre(class="input", placeholder="Enter your middle name") }}
+                        {{ form.segundo_nombre.label }}
+                        <div class="control has-icons-left">
+                            {{ form.segundo_nombre(class="input", placeholder="Enter your middle name") }}
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-user"></i>
+                            </span>
+                        </div>
                     </div>
-                    </div>
-            
+                
                     <div class="field">
-                    {{ form.primer_apellido.label }}
-                    <div class="control">
-                        {{ form.primer_apellido(class="input", placeholder="Enter your first lastname") }}
+                        {{ form.primer_apellido.label }}
+                        <div class="control has-icons-left">
+                            {{ form.primer_apellido(class="input", placeholder="Enter your first lastname") }}
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-user"></i>
+                            </span>
+                        </div>
                     </div>
-                    </div>
-            
+                
                     <div class="field">
-                    {{ form.segundo_apellido.label }}
-                    <div class="control">
-                        {{ form.segundo_apellido(class="input", placeholder="Enter your second lastname") }}
+                        {{ form.segundo_apellido.label }}
+                        <div class="control has-icons-left">
+                            {{ form.segundo_apellido(class="input", placeholder="Enter your second lastname") }}
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-user"></i>
+                            </span>
+                        </div>
                     </div>
-                    </div>
-            
+                
                     <div class="field">
-                    {{ form.documento_de_identidad.label }}
-                    <div class="control">
-                        {{ form.documento_de_identidad(class="input", placeholder="Enter your ID (only numbers)") }}
+                        {{ form.documento_de_identidad.label }}
+                        <div class="control has-icons-left">
+                            {{ form.documento_de_identidad(class="input", placeholder="Enter your ID (only numbers)") }}
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-id-card"></i>
+                            </span>
+                        </div>
                     </div>
-                    </div>
-            
+                
                     <div class="field">
-                    {{ form.telefono.label }}
-                    <div class="control">
-                        {{ form.telefono(class="input", placeholder="Enter your phonenumber") }}
+                        {{ form.telefono.label }}
+                        <div class="control has-icons-left">
+                            {{ form.telefono(class="input", placeholder="Enter your phonenumber") }}
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-phone"></i>
+                            </span>
+                        </div>
                     </div>
-                    </div>
-            
+                
                     <div class="field">
-                    {{ form.fecha_nacimiento.label }}
-                    <div class="control">
-                        {{ form.fecha_nacimiento(class="input") }}
+                        {{ form.fecha_nacimiento.label }}
+                        <div class="control has-icons-left">
+                            {{ form.fecha_nacimiento(class="input") }}
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-calendar-alt"></i>
+                            </span>
+                        </div>
                     </div>
-                    </div>
-            
+                
                     <div class="field">
-                    {{ form.foto_perfil.label }}
-                    <div class="control">
-                        {{ form.foto_perfil(class="file-input") }}
+                        <button class="button is-info is-responsive">
+                            {{ form.foto_perfil.label }}                            
+                            {{ form.foto_perfil(class="file-input") }}
+                        </button>
                     </div>
-                    </div>
-            
+                    <br>
                     <div class="field">
-                    <div class="control">
-                        {{ form.submit(class="button is-primary") }}
+                        <div class="control">
+                            {{ form.submit(class="button is-primary is-fullwidth is-responsive") }}
+                        </div>
                     </div>
-                    </div>
-                </form>
+                </form>                
                 {% endif %}
             </div>
         </div>

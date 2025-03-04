@@ -3,34 +3,73 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<h2 class="title is-2">Login</h2>
-<form method="POST" class="box">
-  {{ form.hidden_tag() }}
-  <div class="field">
-    {{ form.email.label(class="label") }}
-    <div class="control">
-      {{ form.email(class="input") }}
+<section class="section">
+  <div class="container">
+    <div class="columns is-centered">
+      <!-- Columna del formulario -->
+      <div class="column is-half">
+        <div class="box">
+          <h2 class="title is-3 has-text-centered">Login</h2>
+          <form method="POST" action="{{ url_for('auth.login') }}">
+            {{ form.hidden_tag() }}
+
+            <!-- Campo de email -->
+            <div class="field">
+              {{ form.email.label(class="label") }}
+              <div class="control has-icons-left">
+                {{ form.email(class="input", placeholder="Enter your email") }}
+                <span class="icon is-small is-left">
+                  <i class="fas fa-envelope"></i>
+                </span>
+              </div>
+            </div>
+
+            <!-- Campo de contraseña -->
+            <div class="field">
+              {{ form.password.label(class="label") }}
+              <div class="control has-icons-left">
+                {{ form.password(class="input", placeholder="Enter your password") }}
+                <span class="icon is-small is-left">
+                  <i class="fas fa-lock"></i>
+                </span>
+              </div>
+            </div>
+
+            <!-- Botón de envío -->
+            <div class="field">
+              <div class="control">
+                {{ form.submit(class="button is-primary is-fullwidth") }}
+              </div>
+            </div>
+          </form>
+          <br>
+          <!-- Opciones adicionales -->
+          <div class="has-text-centered">
+            <a href="{{ url_for('auth.forgot_password') }}">Forgot password?</a> |
+            <a href="{{ url_for('auth.register') }}">Create account</a>
+          </div>
+        </div>
+
+        <!-- Botones de login alternativo -->
+        <div class="has-text-centered">
+          <p>Or login with:</p>
+          <div class="buttons is-centered">
+            <a class="button is-info" href="{{ url_for('google_login.google_login') }}">
+              <span class="icon"><i class="fab fa-google"></i></span>
+              <span>Google</span>
+            </a>
+            <a class="button is-info" href="{{ url_for('github_login.github_login') }}">
+              <span class="icon"><i class="fab fa-github"></i></span>
+              <span>GitHub</span>
+            </a>
+            <a class="button is-info" href="{{ url_for('microsoft_login.microsoft_login') }}">
+              <span class="icon"><i class="fab fa-microsoft"></i></span>
+              <span>Microsoft</span>
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-  <div class="field">
-    {{ form.password.label(class="label") }}
-    <div class="control">
-      {{ form.password(class="input") }}
-    </div>
-  </div>
-  <div class="field">
-    <div class="control">
-      {{ form.submit(class="button is-primary") }}
-    </div>
-  </div>
-</form>
-<div class="container">
-  <p><a href="{{ url_for('auth.forgot_password') }}">¿Olvidó su contraseña?</a></p>
-  <p><a href="{{ url_for('auth.register') }}">Crear cuenta</a></p>
-</div>
-<div>
-  <a class="button is-info" href="{{ url_for('google_login.google_login') }}">Login with Google</a>
-  <a class="button is-info" href="{{ url_for('github_login.github_login') }}">Login with GitHub</a>
-  <a class="button is-info" href="{{ url_for('microsoft_login.microsoft_login') }}">Login with Microsoft</a>
-</div>
+</section>
 {% endblock %}

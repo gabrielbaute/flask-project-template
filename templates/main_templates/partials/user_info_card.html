@@ -10,6 +10,7 @@
           <div class="media-content">
             <p class="title is-4"><a href="{{ url_for('profile.view_profile') }}">{{ user.username }}</a></p>
             <p class="subtitle is-6">{{ user.email }}</p>
+            <p><a href="{{ url_for('profile.upload_photo') }}">Cambiar foto de perfil</a></p>
           </div>
         </div>
   
@@ -17,7 +18,7 @@
           <p><strong>First Name:</strong> {{ user.primer_nombre or "Not provided" }}</p>
           <p><strong>Last Name:</strong> {{ user.primer_apellido or "Not provided" }}</p>
           <p><strong>Phone:</strong> {{ user.telefono or "Not provided" }}</p>
-          <p><strong>Date of Birth:</strong> {{ user.fecha_nacimiento or "Not provided" }}</p>
+          <p><strong>Date of Birth:</strong><time datetime="">{{ user.fecha_nacimiento or "Not provided" }}</time></p>
           <div class="block">
             <a href="{{ url_for('profile.edit_profile') }}" class="button is-info is-light">Edit Profile</a>
             <a href="{{ url_for('profile.settings') }}" class="button is-info is-light">User Settings</a>

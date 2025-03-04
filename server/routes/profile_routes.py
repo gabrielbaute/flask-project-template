@@ -40,7 +40,8 @@ def upload_photo():
 
     return render_template(
         'profile_templates/upload_photo.html',
-        form=form
+        form=form,
+        user=current_user
     )
 
 
