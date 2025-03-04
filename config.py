@@ -17,6 +17,7 @@ class Config:
     """Configuración de la aplicación Flask."""
 
     # Flask server
+    APP_NAME = os.getenv('APP_NAME', 'MyApp')
     PORT=os.environ.get("PORT")
     DEBUG=os.environ.get("DEBUG")
 

@@ -64,4 +64,10 @@ def create_app():
             app.logger.setLevel(logging.INFO)
             app.logger.info('Flask Template startup')
 
+    # Hacer que APP_NAME esté disponible globalmente en las plantillas
+    @app.context_processor
+    def inject_app_name():
+        return {'app_name': app.config['APP_NAME']}
+    
+
     return app
