@@ -10,22 +10,14 @@
   </head>
   <body>
     {% include 'auth_templates/partials/header.html' %}
-    <div class="container">
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-          <div class="notification is-info">
-            {% for category, message in messages %}
-              <div class="notification is-{{ category }}">
-                {{ message }}
-              </div>
-            {% endfor %}
-          </div>
-        {% endif %}
-      {% endwith %}
+    <div class="main-container">
+      {% include 'main_templates/partials/flash_messages.html' %}
+      
       {% block content %}
       {% endblock %}
     </div>
     
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     {% include 'auth_templates/partials/footer.html' %}
   </body>
 </html>
