@@ -15,4 +15,5 @@ from .auth_forms import(
     ForgotPasswordForm,
     ResetPasswordForm,
     TOTPForm,
-    ReactivateAccountForm)
+    ReactivateAccountForm,
+    VerificationCodeForm)

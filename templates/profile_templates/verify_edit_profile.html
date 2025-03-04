@@ -1,0 +1,26 @@
+{% extends 'main_templates/base.html' %}
+
+{% block title %}Verify Changes{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h1 class="title">Verify Profile Changes</h1>
+    <p>A verification code has been sent to your email. Please enter it below to confirm your changes.</p>
+    <form method="POST" action="{{ url_for('profile.verify_edit_profile') }}">
+      {{ form.hidden_tag() }}
+      <div class="field">
+        {{ form.code.label }}
+        <div class="control">
+          {{ form.code(class="input") }}
+        </div>
+      </div>
+      <div class="field">
+        <div class="control">
+          {{ form.submit(class="button is-primary") }}
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

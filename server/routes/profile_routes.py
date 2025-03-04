@@ -1,13 +1,15 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, abort, send_file, current_app
+from flask import Blueprint, render_template, redirect, url_for, flash, request, abort, send_file, current_app, session
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 import logging, pyotp, os
 
 from database import db
-from database.user_models import User
+from database.user_models import User, VerificationCode
+from mail import send_verification_code
 from utils import create_user_folder, allowed_file, unique_filename
-from server.forms import UploadPhotoForm, ChangePasswordForm, ChangeEmailForm, Enable2FAForm, Disable2FAForm, EditProfileForm
+from server.forms import UploadPhotoForm, ChangePasswordForm, ChangeEmailForm, Enable2FAForm, Disable2FAForm, EditProfileForm, VerificationCodeForm
 
 profile_bp = Blueprint('profile', __name__)
 
@@ -135,28 +137,25 @@ def change_email():
         flash("Invalid form submission", "danger")
     return redirect(url_for('profile.settings'))
 
+from flask import session  # Importar session desde flask para manejar datos temporales
+
 @profile_bp.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
-    # Prellenar el formulario con la información actual del usuario
+    # Prellenar el formulario con los datos del usuario
     form = EditProfileForm(obj=current_user)
 
     if form.validate_on_submit():
-        # Actualizar solo los campos que tienen datos nuevos
-        if form.primer_nombre.data:
-            current_user.primer_nombre = form.primer_nombre.data
-        if form.segundo_nombre.data:
-            current_user.segundo_nombre = form.segundo_nombre.data
-        if form.primer_apellido.data:
-            current_user.primer_apellido = form.primer_apellido.data
-        if form.segundo_apellido.data:
-            current_user.segundo_apellido = form.segundo_apellido.data
-        if form.documento_de_identidad.data:
-            current_user.documento_de_identidad = form.documento_de_identidad.data
-        if form.telefono.data:
-            current_user.telefono = form.telefono.data
-        if form.fecha_nacimiento.data:
-            current_user.fecha_nacimiento = form.fecha_nacimiento.data
+        # Almacenar temporalmente los cambios propuestos en la sesión
+        session['pending_profile_changes'] = {
+            'primer_nombre': form.primer_nombre.data or current_user.primer_nombre,
+            'segundo_nombre': form.segundo_nombre.data or current_user.segundo_nombre,
+            'primer_apellido': form.primer_apellido.data or current_user.primer_apellido,
+            'segundo_apellido': form.segundo_apellido.data or current_user.segundo_apellido,
+            'documento_de_identidad': form.documento_de_identidad.data or current_user.documento_de_identidad,
+            'telefono': form.telefono.data or current_user.telefono,
+            'fecha_nacimiento': form.fecha_nacimiento.data.isoformat() if form.fecha_nacimiento.data else current_user.fecha_nacimiento.isoformat() if current_user.fecha_nacimiento else None
+        }
 
         # Manejar la subida de la foto de perfil
         if form.foto_perfil.data:
@@ -165,13 +164,55 @@ def edit_profile():
             user_folder = create_user_folder(current_user.id)
             filepath = os.path.join(user_folder, filename)
             file.save(filepath)
-            current_user.foto_perfil = filename
+            session['pending_profile_changes']['foto_perfil'] = filename
+        else:
+            session['pending_profile_changes']['foto_perfil'] = current_user.foto_perfil
 
-        # Guardar los cambios en la base de datos
-        db.session.commit()
-
-        logging.info(f"Profile updated for user {current_user.email}")
-        flash('Your profile has been updated successfully!', 'success')
-        return redirect(url_for('profile.view_profile'))
+        # Enviar código de verificación al correo
+        send_verification_code(current_user)
+        flash('A verification code has been sent to your email. Please enter it to confirm your changes.', 'info')
+        return redirect(url_for('profile.verify_edit_profile'))
 
     return render_template('profile_templates/edit_profile.html', form=form, user=current_user)
+
+
+@profile_bp.route('/verify_edit_profile', methods=['GET', 'POST'])
+@login_required
+def verify_edit_profile():
+    verification_form = VerificationCodeForm()
+
+    if verification_form.validate_on_submit():
+        code = verification_form.code.data
+        verification_code = VerificationCode.query.filter_by(
+            user_id=current_user.id,
+            code=code
+        ).order_by(VerificationCode.created_at.desc()).first()
+
+        if not verification_code or verification_code.expires_at < datetime.utcnow():
+            flash("Invalid or expired verification code.", "danger")
+            return redirect(url_for('profile.verify_edit_profile'))
+
+        # Eliminar el código después de la verificación
+        db.session.delete(verification_code)
+        db.session.commit()
+
+        # Aplicar los cambios del perfil desde la sesión
+        profile_changes = session.pop('pending_profile_changes', None)
+        if profile_changes:
+            current_user.primer_nombre = profile_changes['primer_nombre']
+            current_user.segundo_nombre = profile_changes['segundo_nombre']
+            current_user.primer_apellido = profile_changes['primer_apellido']
+            current_user.segundo_apellido = profile_changes['segundo_apellido']
+            current_user.documento_de_identidad = profile_changes['documento_de_identidad']
+            current_user.telefono = profile_changes['telefono']
+            current_user.fecha_nacimiento = (
+                datetime.fromisoformat(profile_changes['fecha_nacimiento'])
+                if profile_changes['fecha_nacimiento'] else None
+            )
+
+            db.session.commit()
+            logging.info(f"Profile updated for user {current_user.email}")
+            flash("Your profile has been updated successfully!", "success")
+        return redirect(url_for('profile.view_profile'))
+
+    return render_template('profile_templates/verify_edit_profile.html', form=verification_form)

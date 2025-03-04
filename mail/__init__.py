@@ -1,7 +1,8 @@
 from .auth_mail import(
     send_confirmation_email,
     send_account_locked_email,
-    send_reset_password_email)
+    send_reset_password_email,
+    send_verification_code)
 
 from .tokens_mail_generator import(
     create_email_token,

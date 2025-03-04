@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired, Email, EqualTo
+from wtforms.validators import DataRequired, Email, EqualTo, Length, Regexp
 
 class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
@@ -34,3 +34,11 @@ class ReactivateAccountForm(FlaskForm):
 class TOTPForm(FlaskForm):
     totp_code = StringField('TOTP Code', validators=[DataRequired()])
     submit = SubmitField('Verify')
+
+class VerificationCodeForm(FlaskForm):
+    code = StringField('Verification Code', validators=[
+        DataRequired(),
+        Length(min=6, max=6),
+        Regexp(r'^\d{6}$', message="Code must be a 6-digit number.")
+    ])
+    submit = SubmitField('Verify Code')

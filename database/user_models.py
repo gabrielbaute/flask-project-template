@@ -81,3 +81,12 @@ class AuditLog(db.Model):
 
     def __repr__(self):
         return f'<SessionHistory {self.usuario_id}>'
+
+from datetime import datetime, timedelta
+
+class VerificationCode(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String(36), db.ForeignKey('user.id'), nullable=False)
+    code = db.Column(db.String(6), nullable=False)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
