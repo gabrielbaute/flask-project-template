@@ -17,6 +17,33 @@ html, body {
     margin-top: 2rem;
   }
   
+  /* Contenedor para centrar las notificaciones */
+.notification-container {
+  position: fixed;
+  top: 12%; /* Ajusta según donde quieras que aparezcan */
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50%; /* Ajusta el ancho según tu diseño */
+  max-width: 400px; /* Límite máximo de tamaño */
+  z-index: 9999; /* Asegúrate de que se muestre por encima de otros elementos */
+}
+
+/* Notificaciones con diseño más compacto */
+.notification {
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative; /* Necesario para el botón de cierre */
+}
+
+/* Estilo del botón de cierre */
+.notification .delete {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  cursor: pointer;
+}
+
   /* flash messages */
   .flash-message {
     margin-bottom: 1rem;

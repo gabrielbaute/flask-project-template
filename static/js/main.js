@@ -55,3 +55,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+
+document.addEventListener('click', (event) => { // Cerrar notificaciones al hacer clic en el botón de eliminar
+  if (event.target.matches('.notification .delete')) {
+    const notification = event.target.parentElement;
+    notification.remove();
+  }
+});
